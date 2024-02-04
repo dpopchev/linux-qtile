@@ -72,8 +72,8 @@ src_dir := src
 $(src_dir):
 	@mkdir -p $@
 
-dotfiles +=
-config_dsts += $(addprefix ${HOME}/.,$(dotfiles))
+dotfiles += qtile
+config_dsts += $(addprefix ${HOME}/.config/,$(dotfiles))
 config_stamps += $(addprefix $(stamp_dir)/,$(addsuffix .$(stamp_suffix),$(dotfiles)))
 install_dotfiles += $(addprefix install-,$(dotfiles))
 uninstall_dotfiles += $(subst install,uninstall,$(install_dotfiles))
@@ -87,6 +87,7 @@ $(install_dotfiles): install-%: $(stamp_dir)/%.$(stamp_suffix)
 $(config_stamps): $(stamp_dir)/%.$(stamp_suffix): | $(stamp_dir)
 	@$(call backup_config,$(filter %$*,$(config_dsts)))
 	@ln -s $(realpath $(src_dir)/$(filter %$*,$(dotfiles))) $(filter %$*,$(config_dsts))
+	@$(call add_gitignore,__pycache__/)
 	@touch $@
 	@$(call log,'install dotfile $*',$(donestr))
 
@@ -108,6 +109,7 @@ $(uninstall_dotfiles): uninstall-%:
 		mv --force $(filter %$*,$(config_dsts)).$(backup_suffix) $(filter %$*,$(config_dsts));\
 		$(call log,'$* dotfile restored',$(donestr));\
 	fi
+	@$(call del_gitignore,__pycache__/)
 	@rm --force $(stamp_dir)/$*.$(stamp_suffix)
 
 .PHONY: clean ###
