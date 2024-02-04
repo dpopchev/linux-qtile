@@ -4,7 +4,7 @@ from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
 MOD_KEY = "mod4"
-terminal = guess_terminal()
+TERMINAL = guess_terminal()
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -38,7 +38,7 @@ keys = [
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
-    Key([MOD_KEY], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
     # Toggle between different layouts as defined below
     Key([MOD_KEY], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([MOD_KEY], "w", lazy.window.kill(), desc="Kill focused window"),
