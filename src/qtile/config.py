@@ -2,9 +2,23 @@ from libqtile import bar, layout, widget
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
+from typing import NamedTuple
 
 MOD_KEY = "mod4"
 TERMINAL = guess_terminal()
+INTRPR = "bash"
+SCRIPTS = "~/.config/i3/scripts"
+MAIN_MONITOR = "eDP-1"
+
+class Volume(NamedTuple):
+    step: int = 5
+    quick_increase: int = 100
+    quick_decrease: int = 50
+
+class Brightness(NamedTuple):
+    step: int = 5
+    quick_increase: int = 100
+    quick_decrease: int = 50
 
 keys = [
     # Switch between windows
@@ -18,50 +32,30 @@ keys = [
     Key([MOD_KEY, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
     Key([MOD_KEY, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([MOD_KEY, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-    # Grow windows. If current window is on the edge of screen and direction
-    # will be to screen edge - window would shrink.
-    Key([MOD_KEY, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([MOD_KEY, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
-    Key([MOD_KEY, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([MOD_KEY, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([MOD_KEY], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-    # Toggle between split and unsplit sides of stack.
-    # Split = all windows displayed
-    # Unsplit = 1 window displayed, like Max layout, but still with
-    # multiple stack panes
-    Key(
-        [MOD_KEY, "shift"],
-        "Return",
-        lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack",
-    ),
     Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
-    # Toggle between different layouts as defined below
-    Key([MOD_KEY], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([MOD_KEY], "w", lazy.window.kill(), desc="Kill focused window"),
-    Key([MOD_KEY, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([MOD_KEY, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([MOD_KEY], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
+    # qtile quit/reload/restart
+    Key([MOD_KEY, "shift"], "e", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([MOD_KEY, "shift"], "c", lazy.reload_config(), desc="Reload Qtile config"),
+    Key([MOD_KEY, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
 ]
 
-groups = [Group(i) for i in "123456789"]
-
-for i in groups:
+for group in [Group(i) for i in "1234567890"]:
     keys.extend(
         [
             # mod1 + letter of group = switch to group
             Key(
                 [MOD_KEY],
-                i.name,
-                lazy.group[i.name].toscreen(),
-                desc="Switch to group {}".format(i.name),
+                group.name,
+                lazy.group[group.name].toscreen(),
+                desc="Switch to group {}".format(group.name),
             ),
             # mod1 + shift + letter of group = switch to & move focused window to group
             Key(
                 [MOD_KEY, "shift"],
-                i.name,
-                lazy.window.togroup(i.name, switch_group=True),
-                desc="Switch to & move focused window to group {}".format(i.name),
+                group.name,
+                lazy.window.togroup(group.name, switch_group=True),
+                desc="Switch to & move focused window to group {}".format(group.name),
             ),
             # Or, use below if you prefer not to switch to that group.
             # # mod1 + shift + letter of group = move focused window to group
@@ -98,7 +92,7 @@ screens = [
         bottom=bar.Bar(
             [
                 widget.CurrentLayout(),
-                widget.GroupBox(),
+                widget.GroupBox(hide_unused=True),
                 widget.Prompt(),
                 widget.WindowName(),
                 widget.Chord(
