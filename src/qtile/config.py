@@ -32,6 +32,10 @@ keys = [
     Key([MOD_KEY, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
     Key([MOD_KEY, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([MOD_KEY, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([MOD_KEY, "shift"], "f", lazy.layout.maximize(), desc=""),
+    Key([MOD_KEY, "shift"], "u", lazy.next_layout(), desc=""),
+    Key([MOD_KEY, "shift"], "n", lazy.layout.normalize(), desc=""),
+    Key([MOD_KEY, "shift"], "t", lazy.layout.reset(), desc=""),
     Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
     Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
@@ -40,7 +44,8 @@ keys = [
     Key([MOD_KEY, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
 ]
 
-for group in [Group(i) for i in "1234567890"]:
+groups = [Group(i) for i in "1234567890"]
+for group in groups:
     keys.extend(
         [
             # mod1 + letter of group = switch to group
@@ -65,13 +70,13 @@ for group in [Group(i) for i in "1234567890"]:
     )
 
 layouts = [
+    layout.MonadTall(),
     # layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
-    # layout.Max(),
+    layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
     # layout.Matrix(),
-    layout.MonadTall(),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
@@ -125,7 +130,7 @@ mouse = [
 
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 floating_layout = layout.Floating(
