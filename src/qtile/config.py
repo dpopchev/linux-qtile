@@ -38,7 +38,7 @@ keys = [
     # Key([MOD_KEY, "shift"], "x", lazy.layout.reset(), desc=""),
     # Key([MOD_KEY], "n", lazy.layout.flip(), desc=""),
     # Key([MOD_KEY, "shift"], "f", lazy.next_layout(), desc=""),
-    # Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
+    Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
     Key([MOD_KEY, "shift"], "e", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([MOD_KEY, "shift"], "c", lazy.reload_config(), desc="Reload Qtile config"),
