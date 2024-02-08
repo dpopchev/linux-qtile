@@ -31,12 +31,12 @@ keys = [
     Key([MOD_KEY, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([MOD_KEY, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
     # layouts control
-    Key([MOD_KEY], "o", lazy.layout.maximize(), desc=""),
-    Key([MOD_KEY, "shift"], "o", lazy.layout.normalize(), desc=""),
-    # Key([MOD_KEY, "shift"], "]", lazy.layout.grow(), desc=""),
-    # Key([MOD_KEY, "shift"], "[", lazy.layout.shrink(), desc=""),
-    # Key([MOD_KEY, "shift"], "x", lazy.layout.reset(), desc=""),
-    # Key([MOD_KEY], "n", lazy.layout.flip(), desc=""),
+    Key([MOD_KEY], "o", lazy.layout.maximize(), desc="Layout context maximize"),
+    Key([MOD_KEY, "shift"], "o", lazy.layout.normalize(), desc="Layout context normalize"),
+    Key([MOD_KEY], "equal", lazy.layout.reset(), desc="Layout size reset"),
+    Key([MOD_KEY], "i", lazy.layout.grow(), desc="Layout context window grow"),
+    Key([MOD_KEY, "shift"], "i", lazy.layout.shrink(), desc="Layout context window shrink"),
+    Key([MOD_KEY, "shift"], "minus", lazy.layout.flip(), desc="Layout context flip"),
     # Key([MOD_KEY, "shift"], "f", lazy.next_layout(), desc=""),
     Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
