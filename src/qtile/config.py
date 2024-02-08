@@ -3,11 +3,12 @@ from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from typing import NamedTuple
+from pathlib import Path
 
 MOD_KEY = "mod4"
 TERMINAL = guess_terminal()
 INTRPR = "bash"
-SCRIPTS = "~/.config/i3/scripts"
+UTILS = Path.home().joinpath(".config/qtile/utils/")
 MAIN_MONITOR = "eDP-1"
 
 class Volume(NamedTuple):
@@ -44,7 +45,9 @@ keys = [
     Key([MOD_KEY, "shift"], "c", lazy.reload_config(), desc="Reload Qtile config"),
     Key([MOD_KEY, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
     # programs
-    Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
+    Key([MOD_KEY], "return", lazy.spawn(TERMINAL), desc="Launch terminal"),
+    Key([MOD_KEY], "d", lazy.spawn("dmenu_run"), desc="Launch dmenu_run"),
+    Key([MOD_KEY, "shift"], "d", lazy.spawn(f"{INTRPR} {UTILS.joinpath('dmenu_tools')}"), desc="Launch terminal"),
 ]
 
 groups = [Group(i) for i in "1234567890"]
