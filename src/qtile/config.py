@@ -21,27 +21,30 @@ class Brightness(NamedTuple):
     quick_decrease: int = 50
 
 keys = [
-    # Switch between windows
+    # windows control
     Key([MOD_KEY], "h", lazy.layout.left(), desc="Move focus to left"),
     Key([MOD_KEY], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([MOD_KEY], "j", lazy.layout.down(), desc="Move focus down"),
     Key([MOD_KEY], "k", lazy.layout.up(), desc="Move focus up"),
-    # Move windows between left/right columns or move up/down in current stack.
-    # Moving out of range in Columns layout will create new column.
-    Key([MOD_KEY, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
-    Key([MOD_KEY, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([MOD_KEY, "shift"], "h", lazy.layout.swap_left(), desc="Move window to the left"),
+    Key([MOD_KEY, "shift"], "l", lazy.layout.swap_right(), desc="Move window to the right"),
     Key([MOD_KEY, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([MOD_KEY, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-    Key([MOD_KEY, "shift"], "f", lazy.layout.maximize(), desc=""),
-    Key([MOD_KEY, "shift"], "u", lazy.next_layout(), desc=""),
-    Key([MOD_KEY, "shift"], "n", lazy.layout.normalize(), desc=""),
-    Key([MOD_KEY, "shift"], "t", lazy.layout.reset(), desc=""),
-    Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
+    # layouts control
+    Key([MOD_KEY], "o", lazy.layout.maximize(), desc=""),
+    Key([MOD_KEY, "shift"], "o", lazy.layout.normalize(), desc=""),
+    # Key([MOD_KEY, "shift"], "]", lazy.layout.grow(), desc=""),
+    # Key([MOD_KEY, "shift"], "[", lazy.layout.shrink(), desc=""),
+    # Key([MOD_KEY, "shift"], "x", lazy.layout.reset(), desc=""),
+    # Key([MOD_KEY], "n", lazy.layout.flip(), desc=""),
+    # Key([MOD_KEY, "shift"], "f", lazy.next_layout(), desc=""),
     Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
     Key([MOD_KEY, "shift"], "e", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([MOD_KEY, "shift"], "c", lazy.reload_config(), desc="Reload Qtile config"),
     Key([MOD_KEY, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
+    # programs
+    Key([MOD_KEY], "Return", lazy.spawn(TERMINAL), desc="Launch terminal"),
 ]
 
 groups = [Group(i) for i in "1234567890"]
