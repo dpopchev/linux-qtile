@@ -31,6 +31,7 @@ keys = [
     Key([MOD_KEY, "shift"], "l", lazy.layout.swap_right(), desc="Move window to the right"),
     Key([MOD_KEY, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([MOD_KEY, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # layouts control
     Key([MOD_KEY], "o", lazy.layout.maximize(), desc="Layout context maximize"),
     Key([MOD_KEY, "shift"], "o", lazy.layout.normalize(), desc="Layout context normalize"),
@@ -44,7 +45,6 @@ keys = [
             Key([], 'm', lazy.group.setlayout('monadtall'), desc='')
         ],
     ),
-    Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
     Key([MOD_KEY, "shift"], "e", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([MOD_KEY, "shift"], "c", lazy.reload_config(), desc="Reload Qtile config"),
