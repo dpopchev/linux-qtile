@@ -1,9 +1,11 @@
-from libqtile import bar, layout, widget
+from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from typing import NamedTuple
 from pathlib import Path
+import subprocess
+import inspect
 
 MOD_KEY = "mod4"
 TERMINAL = guess_terminal()
@@ -11,15 +13,61 @@ INTRPR = "bash"
 UTILS = Path.home().joinpath(".config/qtile/utils/")
 MAIN_MONITOR = "eDP-1"
 
-class Volume(NamedTuple):
+class VolumeConsts(NamedTuple):
     step: int = 5
-    quick_increase: int = 100
-    quick_decrease: int = 50
+    quick_inc: int = 100
+    quick_dec: int = 50
 
-class Brightness(NamedTuple):
+volume_consts = VolumeConsts()
+
+class BrightnessConsts(NamedTuple):
     step: int = 5
-    quick_increase: int = 100
-    quick_decrease: int = 50
+    quick_inc: int = 100
+    quick_dec: int = 50
+
+brightness_consts = BrightnessConsts()
+
+def whoami():
+    return inspect.stack()[1][3]
+
+
+def join_intrpr_with(util_name: str) -> list:
+    return [INTRPR, UTILS.joinpath(util_name)]
+
+@hook.subscribe.startup_once
+def setup_suspend_locker(utils: Path = UTILS, locker_name: str = 'lock'):
+    util = utils.joinpath(whoami())
+    locker = utils.joinpath(locker_name)
+    subprocess.Popen([util, locker], shell=False)
+
+@hook.subscribe.startup_once
+def disable_all_monitors_but(utils: Path = UTILS, main_monitor: str = MAIN_MONITOR):
+    util = utils.joinpath(whoami())
+    subprocess.run([util, main_monitor])
+
+@hook.subscribe.startup_once
+def start_color_adjustment_service(utils: Path = UTILS):
+    util = utils.joinpath(whoami())
+    subprocess.Popen([util], shell=False)
+
+@hook.subscribe.startup
+def xxkb(utils: Path = UTILS):
+    subprocess.Popen([f"{utils.joinpath('start_single_instance')}", whoami()], shell=False)
+
+@hook.subscribe.startup_once
+def mute_volume(utils: Path = UTILS):
+    util = utils.joinpath(whoami())
+    subprocess.run([util, 'yes'])
+
+@hook.subscribe.startup_once
+def mute_mic(utils: Path = UTILS):
+    util = utils.joinpath(whoami())
+    subprocess.run([util, 'yes'])
+
+@hook.subscribe.startup_once
+def unload_camera_module(utils: Path = UTILS):
+    util = utils.joinpath(whoami())
+    subprocess.run([util])
 
 keys = [
     # windows control
@@ -52,7 +100,26 @@ keys = [
     # programs
     Key([MOD_KEY], "return", lazy.spawn(TERMINAL), desc="Launch terminal"),
     Key([MOD_KEY], "d", lazy.spawn("dmenu_run"), desc="Launch dmenu_run"),
-    Key([MOD_KEY, "shift"], "d", lazy.spawn(f"{INTRPR} {UTILS.joinpath('dmenu_tools')}"), desc="Launch terminal"),
+    Key([MOD_KEY, "shift"], "d", lazy.spawn(f"{UTILS.joinpath('dmenu_tools')}"), desc="Launch terminal"),
+    Key([MOD_KEY], "backspace", lazy.spawn('xset s activate'), desc="Lock screen"),
+    # audio
+    Key([], "XF86AudioMute", lazy.spawn(f"{UTILS.joinpath('mute_volume')}")),
+    Key(["shift"], "XF86AudioMute", lazy.spawn(f"{UTILS.joinpath('mute_volume')} yes")),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn(f"{UTILS.joinpath('change_volume')} inc {volume_consts.step}")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn(f"{UTILS.joinpath('change_volume')} dec {volume_consts.step}")),
+    Key(["shift"], "XF86AudioRaiseVolume", lazy.spawn(f"{UTILS.joinpath('change_volume')} set {volume_consts.quick_inc}")),
+    Key(["shift"], "XF86AudioLowerVolume", lazy.spawn(f"{UTILS.joinpath('change_volume')} set {volume_consts.quick_dec}")),
+    # mic
+    Key([], "XF86AudioMicMute", lazy.spawn(f"{UTILS.joinpath('mute_mic')}")),
+    Key(["shift"], "XF86AudioMicMute", lazy.spawn(f"{UTILS.joinpath('mute_mic')} yes")),
+    # brightness
+    Key([], "XF86MonBrightnessUp", lazy.spawn(f"{UTILS.joinpath('change_brightness')} inc {brightness_consts.step}")),
+    Key([], "XF86MonBrightnessDown", lazy.spawn(f"{UTILS.joinpath('change_brightness')} dec {brightness_consts.step}")),
+    Key(["shift"], "XF86MonBrightnessUp", lazy.spawn(f"{UTILS.joinpath('change_brightness')} set {brightness_consts.quick_inc}")),
+    Key(["shift"], "XF86MonBrightnessDown", lazy.spawn(f"{UTILS.joinpath('change_brightness')} set {brightness_consts.quick_dec}")),
+    # camera
+    Key([], "XF86Display", lazy.spawn(f"{UTILS.joinpath('toggle_kernel_module')} uvcvideo")),
+    Key(["shift"], "XF86Display", lazy.spawn(f"{UTILS.joinpath('unload_camera_module')}")),
 ]
 
 groups = [Group(i) for i in "1234567890"]
@@ -81,7 +148,12 @@ for group in groups:
     )
 
 layouts = [
-    layout.MonadTall(),
+    layout.MonadTall(
+        border_width = 7,
+        border_focus = "#EE4E34",
+        border_normal = "#FCEDDA",
+        single_border_width = 0
+    ),
     layout.Max(),
 ]
 
