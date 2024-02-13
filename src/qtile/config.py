@@ -1,10 +1,9 @@
 from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from typing import NamedTuple
 from pathlib import Path
-from dataclasses import dataclass
 
 MOD_KEY = "mod4"
 TERMINAL = guess_terminal()
@@ -21,10 +20,6 @@ class Brightness(NamedTuple):
     step: int = 5
     quick_increase: int = 100
     quick_decrease: int = 50
-
-@dataclass
-class LayoutState:
-    state: str
 
 keys = [
     # windows control
@@ -43,7 +38,12 @@ keys = [
     Key([MOD_KEY], "i", lazy.layout.grow(), desc="Layout context window grow"),
     Key([MOD_KEY, "shift"], "i", lazy.layout.shrink(), desc="Layout context window shrink"),
     Key([MOD_KEY, "shift"], "minus", lazy.layout.flip(), desc="Layout context flip"),
-    # Key([MOD_KEY, "shift"], "f", lazy.group.setlayout('max'), desc=""),
+    KeyChord(
+        [MOD_KEY, "shift"], 'f', [
+            Key([], 'f', lazy.group.setlayout('max'), desc=''),
+            Key([], 'm', lazy.group.setlayout('monadtall'), desc='')
+        ],
+    ),
     Key([MOD_KEY, "shift"], "q", lazy.window.kill(), desc="Kill focused window"),
     # qtile quit/reload/restart
     Key([MOD_KEY, "shift"], "e", lazy.shutdown(), desc="Shutdown Qtile"),
@@ -82,18 +82,7 @@ for group in groups:
 
 layouts = [
     layout.MonadTall(),
-    # layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
     layout.Max(),
-    # Try more layouts by unleashing below layouts.
-    # layout.Stack(num_stacks=2),
-    # layout.Bsp(),
-    # layout.Matrix(),
-    # layout.MonadWide(),
-    # layout.RatioTile(),
-    # layout.Tile(),
-    # layout.TreeTab(),
-    # layout.VerticalTile(),
-    # layout.Zoomy(),
 ]
 
 widget_defaults = dict(
