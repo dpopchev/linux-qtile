@@ -165,12 +165,27 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
+BATTERY_WIDGET = {
+    'charge_char': 'CHR',
+    'discharge_char': 'DIS',
+    'empty_char': 'EMP',
+    'full_char': 'FUL',
+    'not_charging_char': 'STP',
+    'unknown_char': 'UNK',
+    'low_percenteage': 0.2,
+    'notify_below': 30,
+    'max_chars': 20
+}
+
 screens = [
     Screen(
         bottom=bar.Bar(
             [
                 widget.CurrentLayout(),
                 widget.GroupBox(hide_unused=True),
+                # widget.load.Load(),
+                widget.Battery(battery=0, **BATTERY_WIDGET),
+                widget.Battery(battery=1, **BATTERY_WIDGET),
                 widget.WindowName(),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
