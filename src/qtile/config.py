@@ -52,7 +52,8 @@ def start_color_adjustment_service(utils: Path = UTILS):
 
 @hook.subscribe.startup
 def xxkb(utils: Path = UTILS):
-    subprocess.Popen([f"{utils.joinpath('start_single_instance')}", whoami()], shell=False)
+    subprocess.run(['killall', whoami()])
+    subprocess.Popen([whoami()], shell=False)
 
 @hook.subscribe.startup_once
 def mute_volume(utils: Path = UTILS):
@@ -170,7 +171,6 @@ screens = [
             [
                 widget.CurrentLayout(),
                 widget.GroupBox(hide_unused=True),
-                widget.Prompt(),
                 widget.WindowName(),
                 widget.Chord(
                     chords_colors={
