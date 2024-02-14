@@ -1,4 +1,5 @@
 from libqtile import bar, layout, widget, hook
+from psutil import getloadavg
 from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
@@ -177,13 +178,18 @@ BATTERY_WIDGET = {
     'max_chars': 20
 }
 
+
+class LoadavgPoll(widget.Load):
+    def poll(self):
+        return "load: " + " : ".join(f"{l:.2f}" for l in getloadavg())
+
 screens = [
     Screen(
         bottom=bar.Bar(
             [
                 widget.CurrentLayout(),
                 widget.GroupBox(hide_unused=True),
-                # widget.load.Load(),
+                LoadavgPoll(),
                 widget.Battery(battery=0, **BATTERY_WIDGET),
                 widget.Battery(battery=1, **BATTERY_WIDGET),
                 widget.WindowName(),
