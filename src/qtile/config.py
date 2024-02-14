@@ -51,10 +51,10 @@ def start_color_adjustment_service(utils: Path = UTILS):
     util = utils.joinpath(whoami())
     subprocess.Popen([util], shell=False)
 
-@hook.subscribe.startup
-def xxkb():
-    subprocess.run(['killall', '-9', whoami()])
-    subprocess.Popen([whoami()])
+# @hook.subscribe.startup
+# def xxkb():
+#     subprocess.run(['killall', '-9', whoami()])
+#     subprocess.Popen([whoami()])
 
 @hook.subscribe.startup_once
 def mute_volume(utils: Path = UTILS):
@@ -175,27 +175,53 @@ BATTERY_WIDGET = {
     'unknown_char': 'UNK',
     'low_percenteage': 0.2,
     'notify_below': 30,
-    'max_chars': 20
+    'max_chars': 20,
+    'hide_threshold': 0.6
 }
 
+SPACER_LEN = 10
 
 class LoadavgPoll(widget.Load):
     def poll(self):
-        return "load: " + " : ".join(f"{l:.2f}" for l in getloadavg())
+        loadavg = " : ".join(f"{l:.2f}" for l in getloadavg())
+        return f"[{loadavg}]"
 
 screens = [
     Screen(
         bottom=bar.Bar(
             [
+                widget.Spacer(length=SPACER_LEN),
                 widget.CurrentLayout(),
+                widget.Spacer(length=SPACER_LEN),
                 widget.GroupBox(hide_unused=True),
+                widget.Spacer(length=SPACER_LEN),
                 LoadavgPoll(),
+                widget.Spacer(length=SPACER_LEN),
+                widget.CPU(),
+                widget.Spacer(length=SPACER_LEN),
+                widget.ThermalSensor(),
+                widget.Spacer(length=SPACER_LEN),
+                widget.Memory(format="RAM: {MemPercent:.0f}%"),
+                widget.Spacer(length=SPACER_LEN),
+                widget.Memory(format="SWAP: {SwapPercent:.0f}%"),
+                widget.Spacer(length=SPACER_LEN),
+                widget.DF(format="HDD {r:.0f}%", visible_on_warn=False),
+                widget.Spacer(length=SPACER_LEN),
                 widget.Battery(battery=0, **BATTERY_WIDGET),
+                widget.Spacer(length=SPACER_LEN),
                 widget.Battery(battery=1, **BATTERY_WIDGET),
-                widget.WindowName(),
+                widget.Spacer(length=SPACER_LEN),
+                widget.CheckUpdates(distro='Gentoo_eix', update_interval=60*60*24),
+                widget.Spacer(length=SPACER_LEN),
+                widget.Spacer(length=SPACER_LEN),
+                widget.Clock(format="%H:%M %d-%m-%Y"),
+                widget.Spacer(length=SPACER_LEN),
+                widget.Clipboard(),
+                widget.Spacer(length=SPACER_LEN),
+                widget.KeyboardKbdd(configured_keyboards=['bg', 'us'])
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+                widget.Spacer(length=SPACER_LEN),
                 widget.Systray(),
             ],
             20,
