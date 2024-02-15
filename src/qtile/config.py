@@ -3,7 +3,7 @@ from psutil import getloadavg
 from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
-from typing import NamedTuple
+from typing import Sequence, NamedTuple
 from pathlib import Path
 import subprocess
 import inspect
@@ -151,7 +151,7 @@ for group in groups:
 
 layouts = [
     layout.MonadTall(
-        border_width = 7,
+        border_width = 6,
         border_focus = "#EE4E34",
         border_normal = "#FCEDDA",
         single_border_width = 0
@@ -162,7 +162,7 @@ layouts = [
 widget_defaults = dict(
     font="sans",
     fontsize=12,
-    padding=3,
+    padding=4,
 )
 extension_defaults = widget_defaults.copy()
 
@@ -175,54 +175,72 @@ BATTERY_WIDGET = {
     'unknown_char': 'UNK',
     'low_percenteage': 0.2,
     'notify_below': 30,
-    'max_chars': 20,
     'hide_threshold': 0.6
 }
 
-SPACER_LEN = 10
+# SPACER_LEN = 10
+# widget.Spacer(),
 
 class LoadavgPoll(widget.Load):
+    """standard load average poll"""
     def poll(self):
         loadavg = " : ".join(f"{l:.2f}" for l in getloadavg())
-        return f"[{loadavg}]"
+        return f"[ {loadavg} ]"
+
+def surround(text: str, using: Sequence = ('[', ']')) -> str:
+    return f"{using[0]} {text} {using[1]}"
+
+class HiddenBattery(widget.Battery):
+    """hide battery if status update raises runtime error"""
+    def poll(self) -> str:
+        msg = super().poll()
+        if msg.startswith('Error'):
+            msg = 'missing'
+        return surround(f"BAT {self.battery}: {msg}")
+
 
 screens = [
     Screen(
         bottom=bar.Bar(
             [
-                widget.Spacer(length=SPACER_LEN),
-                widget.CurrentLayout(),
-                widget.Spacer(length=SPACER_LEN),
                 widget.GroupBox(hide_unused=True),
-                widget.Spacer(length=SPACER_LEN),
                 LoadavgPoll(),
-                widget.Spacer(length=SPACER_LEN),
-                widget.CPU(),
-                widget.Spacer(length=SPACER_LEN),
-                widget.ThermalSensor(),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Memory(format="RAM: {MemPercent:.0f}%"),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Memory(format="SWAP: {SwapPercent:.0f}%"),
-                widget.Spacer(length=SPACER_LEN),
-                widget.DF(format="HDD {r:.0f}%", visible_on_warn=False),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Battery(battery=0, **BATTERY_WIDGET),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Battery(battery=1, **BATTERY_WIDGET),
-                widget.Spacer(length=SPACER_LEN),
-                widget.CheckUpdates(distro='Gentoo_eix', update_interval=60*60*24),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Clock(format="%H:%M %d-%m-%Y"),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Clipboard(),
-                widget.Spacer(length=SPACER_LEN),
+                widget.CPU(
+                    format=surround("CPU: {freq_current:.1f}Ghz / {load_percent:.0f}%")
+                ),
+                widget.ThermalSensor(
+                    format=surround("{temp:.0f}{unit}"),
+                    threshold=50
+                ),
+                widget.Memory(
+                    format=surround("RAM: {MemPercent:.0f}%")),
+                widget.Memory(
+                    format=surround("SWAP: {SwapPercent:.0f}%")
+                ),
+                widget.DF(
+                    format=surround("gentoo{p}: {uf}{m} ( {r:.0f}% )"),
+                    partition='/',
+                    visible_on_warn=True
+                ),
+                widget.Spacer(),
+                HiddenBattery(battery=0, **BATTERY_WIDGET),
+                HiddenBattery(battery=1, **BATTERY_WIDGET),
+                widget.Wlan(
+                    interface='wlp2s0',
+                    format=surround('W: {essid} {percent:2.0%}')
+                ),
+                widget.Net(),
+                widget.CheckUpdates(
+                    format=surround("Updates: {updates}"),
+                    distro='Gentoo_eix',
+                    update_interval=3600
+                ),
+                widget.Clock(format=surround("%H:%M %d-%m-%Y")),
                 widget.KeyboardKbdd(configured_keyboards=['us','bg'], update_interval=0.1),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                # widget.StatusNotifier(),
-                widget.Spacer(length=SPACER_LEN),
-                widget.Systray(),
+                widget.StatusNotifier(),
+                # widget.Systray(),
+                widget.CurrentLayout(),
             ],
             20,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
@@ -233,9 +251,9 @@ screens = [
 
 # Drag floating layouts.
 mouse = [
-    Drag([MOD_KEY], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-    Drag([MOD_KEY], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
-    Click([MOD_KEY], "Button2", lazy.window.bring_to_front()),
+    # Drag([MOD_KEY], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    # Drag([MOD_KEY], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    # Click([MOD_KEY], "Button2", lazy.window.bring_to_front()),
 ]
 
 dgroups_key_binder = None
