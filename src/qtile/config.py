@@ -51,10 +51,9 @@ def start_color_adjustment_service(utils: Path = UTILS):
     util = utils.joinpath(whoami())
     subprocess.Popen([util], shell=False)
 
-# @hook.subscribe.startup
-# def xxkb():
-#     subprocess.run(['killall', '-9', whoami()])
-#     subprocess.Popen([whoami()])
+@hook.subscribe.startup_once
+def kbdd():
+    subprocess.run([whoami()])
 
 @hook.subscribe.startup_once
 def mute_volume(utils: Path = UTILS):
@@ -218,7 +217,7 @@ screens = [
                 widget.Spacer(length=SPACER_LEN),
                 widget.Clipboard(),
                 widget.Spacer(length=SPACER_LEN),
-                widget.KeyboardKbdd(configured_keyboards=['bg', 'us'])
+                widget.KeyboardKbdd(configured_keyboards=['us','bg'], update_interval=0.1),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Spacer(length=SPACER_LEN),
