@@ -7,9 +7,10 @@ from typing import NamedTuple
 from pathlib import Path
 import subprocess
 import inspect
+import os
 
 MOD_KEY = "mod4"
-TERMINAL = guess_terminal()
+TERMINAL = os.environ.get('TERMINAL') if os.environ.get('TERMINAL') else guess_terminal()
 INTRPR = "bash"
 UTILS = Path.home().joinpath(".config/qtile/utils/")
 MAIN_MONITOR = "eDP-1"
@@ -31,7 +32,6 @@ brightness_consts = BrightnessConsts()
 def whoami():
     return inspect.stack()[1][3]
 
-
 def join_intrpr_with(util_name: str) -> list:
     return [INTRPR, UTILS.joinpath(util_name)]
 
@@ -39,7 +39,7 @@ def join_intrpr_with(util_name: str) -> list:
 def setup_suspend_locker(utils: Path = UTILS, locker_name: str = 'lock'):
     util = utils.joinpath(whoami())
     locker = utils.joinpath(locker_name)
-    subprocess.Popen([util, locker], shell=False)
+    subprocess.Popen([util, locker])
 
 @hook.subscribe.startup_once
 def disable_all_monitors_but(utils: Path = UTILS, main_monitor: str = MAIN_MONITOR):
@@ -49,11 +49,12 @@ def disable_all_monitors_but(utils: Path = UTILS, main_monitor: str = MAIN_MONIT
 @hook.subscribe.startup_once
 def start_color_adjustment_service(utils: Path = UTILS):
     util = utils.joinpath(whoami())
-    subprocess.Popen([util], shell=False)
+    subprocess.Popen([util])
 
-@hook.subscribe.startup_once
-def kbdd():
-    subprocess.run([whoami()])
+@hook.subscribe.startup_complete
+def kbdd(utils: Path = UTILS):
+    util = utils.joinpath(whoami())
+    subprocess.Popen([util])
 
 @hook.subscribe.startup_once
 def mute_volume(utils: Path = UTILS):
