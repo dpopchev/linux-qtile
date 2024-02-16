@@ -198,6 +198,8 @@ class HiddenBattery(widget.Battery):
             msg = 'missing'
         return surround(f"BAT {self.battery}: {msg}")
 
+WAN_INTERFACE = 'wlp2s0'
+ETH_INTERFACE = 'enp0s31f6'
 
 screens = [
     Screen(
@@ -226,14 +228,8 @@ screens = [
                 HiddenBattery(battery=0, **BATTERY_WIDGET),
                 HiddenBattery(battery=1, **BATTERY_WIDGET),
                 widget.Wlan(
-                    interface='wlp2s0',
+                    interface=WAN_INTERFACE,
                     format=surround('W: {essid} {percent:2.0%}')
-                ),
-                widget.Net(),
-                widget.CheckUpdates(
-                    format=surround("Updates: {updates}"),
-                    distro='Gentoo_eix',
-                    update_interval=3600
                 ),
                 widget.Clock(format=surround("%H:%M %d-%m-%Y")),
                 widget.KeyboardKbdd(configured_keyboards=['us','bg'], update_interval=0.1),
