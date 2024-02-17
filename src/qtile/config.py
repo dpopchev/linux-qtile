@@ -199,7 +199,7 @@ class HiddenBattery(widget.Battery):
         return surround(f"BAT {self.battery}: {msg}")
 
 # WAN_INTERFACE = 'wlp2s0'
-ETH_INTERFACE = 'enp0s31f6'
+# ETH_INTERFACE = 'enp0s31f6'
 
 screens = [
     Screen(
