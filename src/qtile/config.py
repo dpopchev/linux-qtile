@@ -198,7 +198,7 @@ class HiddenBattery(widget.Battery):
             msg = 'missing'
         return surround(f"BAT {self.battery}: {msg}")
 
-WAN_INTERFACE = 'wlp2s0'
+# WAN_INTERFACE = 'wlp2s0'
 ETH_INTERFACE = 'enp0s31f6'
 
 screens = [
@@ -234,8 +234,8 @@ screens = [
                 widget.Clock(format=surround("%H:%M %d-%m-%Y")),
                 widget.KeyboardKbdd(configured_keyboards=['us','bg'], update_interval=0.1),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                widget.StatusNotifier(),
-                # widget.Systray(),
+                # widget.StatusNotifier(),
+                widget.Systray(),
                 widget.CurrentLayout(),
             ],
             20,
