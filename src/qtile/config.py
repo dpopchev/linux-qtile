@@ -71,8 +71,16 @@ def unload_camera_module(utils: Path = UTILS):
     util = utils.joinpath(whoami())
     subprocess.run([util])
 
+@lazy.function
+def bring_float_front(qtile):
+    """bring the floating window to front"""
+    for window in qtile.current_group.windows:
+        if window.floating:
+            window.cmd_bring_to_front()
+
 keys = [
     # windows control
+    Key([MOD_KEY, "control"], "k", bring_float_front, desc="Move focus down"),
     Key([MOD_KEY], "h", lazy.layout.left(), desc="Move focus to left"),
     Key([MOD_KEY], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([MOD_KEY], "j", lazy.layout.down(), desc="Move focus down"),
