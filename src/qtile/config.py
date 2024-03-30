@@ -78,6 +78,7 @@ def bring_float_front(qtile):
         if window.floating:
             window.cmd_bring_to_front()
 
+DEFAULT_LAYOUT = "monadtall"
 keys = [
     # windows control
     Key([MOD_KEY, "control"], "k", bring_float_front, desc="Move focus down"),
@@ -100,6 +101,7 @@ keys = [
     KeyChord(
         [MOD_KEY, "shift"], 'f', [
             Key([], 'f', lazy.group.setlayout('max'), desc=''),
+            Key(["shift"], 'f', lazy.group.setlayout(DEFAULT_LAYOUT), desc=''),
             Key([], 'm', lazy.group.setlayout('monadtall'), desc='')
         ],
     ),
